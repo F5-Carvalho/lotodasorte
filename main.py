@@ -191,58 +191,6 @@ class CoracaoFixo(Widget):
             v = [self.x, self.y + self.height * 0.5, 0, 0, self.x + self.width, self.y + self.height * 0.5, 0, 0, self.x + self.width * 0.5, self.y + dp(1), 0, 0]
             Mesh(vertices=v, indices=[0, 1, 2], mode='triangles')
 
-class SplashScreen(Screen):
-    def __init__(self, app, **kw):
-        super().__init__(name='splash', **kw)
-        self.app = app
-        self._build()
-
-    def _build(self):
-        root = FundoBox(orientation='vertical', padding=dp(24))
-        root.add_widget(Widget())
-        conteudo = CardBox(orientation='vertical', padding=dp(24), size_hint=(1, None), height=dp(240))
-        camada_interna = FloatLayout(size_hint=(1, 1))
-        
-        lbl_titulo = make_label("LOTO DA SORTE", size=28, cor=C_BORDA, bold=True, halign='center')
-        lbl_titulo.size_hint = (1, None)
-        lbl_titulo.height = dp(50)
-        lbl_titulo.pos_hint = {'x': 0, 'top': 1.0}
-        camada_interna.add_widget(lbl_titulo)
-        
-        w_sep = sep()
-        w_sep.size_hint = (1, None)
-        w_sep.height = dp(2)
-        w_sep.pos_hint = {'x': 0, 'top': 0.72}
-        camada_interna.add_widget(w_sep)
-
-        lbl_creditos = make_label("Feito por Kelson Carvalho", size=14, cor=C_TEXTO, halign='center')
-        lbl_creditos.size_hint = (1, None)
-        lbl_creditos.height = dp(36)
-        lbl_creditos.pos_hint = {'x': 0, 'center_y': 0.45}
-        camada_interna.add_widget(lbl_creditos)
-        
-        cora = CoracaoFixo()
-        cora.pos_hint = {'center_x': 0.5, 'center_y': 0.30}
-        camada_interna.add_widget(cora)
-
-        lbl_carga = make_label("Carregando arquivos...", size=12, cor=C_SUBTEXTO, halign='center')
-        lbl_carga.size_hint = (1, None)
-        lbl_carga.height = dp(30)
-        lbl_carga.pos_hint = {'x': 0, 'y': 0.05}
-        camada_interna.add_widget(lbl_carga)
-        
-        conteudo.add_widget(camada_interna)
-        root.add_widget(conteudo)
-        root.add_widget(Widget())
-        self.add_widget(root)
-
-    def on_enter(self):
-        Clock.schedule_once(self._ir_para_home, 3)
-
-    def _ir_para_home(self, dt):
-        self.app.sm.transition = SlideTransition(direction='left')
-        self.app.sm.current = 'home'
-
 class HomeScreen(Screen):
     def __init__(self, app, **kw):
         super().__init__(name='home', **kw)
@@ -425,13 +373,13 @@ class LotoDaSorteApp(App):
             self.salvos = []
 
         self.sm = ScreenManager()
-        self.splash_scr = SplashScreen(self)
         self.home_scr   = HomeScreen(self)
         self.gerar_scr  = GerarScreen(self)
         self.jogos_scr  = JogosScreen(self)
         
-        for s in (self.splash_scr, self.home_scr, self.gerar_scr, self.jogos_scr):
-            self.sm.add_widget(s)
+        self.sm.add_widget(self.home_scr)
+        self.sm.add_widget(self.gerar_scr)
+        self.sm.add_widget(self.jogos_scr)
             
         return self.sm
 
