@@ -84,11 +84,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildozer-
 
-    - name: Gerar APK com Buildozer (Aceitando Licenças em Tempo de Execução)
+    - name: Gerar APK com Buildozer
+      env:
+        APP_ANDROID_ACCEPT_LICENSES: "1"
       run: |
-        # Injeta automaticamente o "yes" para qualquer prompt de licença que o SDK do Android abrir no terminal
-        yes | buildozer -v android debug
-
+        # Executa o buildozer aceitando os termos via variável interna de ambiente
+        buildozer --allow-root -v android debug
+        
     - name: Upload da APK gerada como Artefato
       uses: actions/upload-artifact@v4
       with:
