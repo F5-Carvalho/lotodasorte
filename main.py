@@ -1,8 +1,3 @@
-"""
-LotoDaSorte - Gerador Inteligente de Apostas Lotofacil
-Versão Corrigida para APK (Sem travamento de caminhos)
-"""
-
 import random
 import json
 import os
@@ -22,7 +17,6 @@ from kivy.clock import Clock
 
 Window.clearcolor = (0.05, 0.0, 0.10, 1)
 
-# Paleta de Cores
 C_FUNDO     = (0.05, 0.00, 0.10, 1)
 C_CARD      = (0.12, 0.02, 0.22, 1)
 C_ROXO_VIV  = (0.55, 0.10, 0.90, 1)
@@ -44,7 +38,7 @@ def calcular_soma(n): return sum(n)
 def tem_sequencia(n):
     s = sorted(n)
     return any(s[i+1] == s[i]+1 for i in range(len(s)-1))
-def linhas_cobertas(n):
+def lines_covered(n):
     return sum(1 for l in LINHAS if set(n) & l)
 
 def validar(nums, fp, fpa, fs, fse, fl):
@@ -52,7 +46,7 @@ def validar(nums, fp, fpa, fs, fse, fl):
     if fpa and not (6 <= contar_pares(nums)  <= 9): return False
     if fs  and not (170 <= calcular_soma(nums) <= 230): return False
     if fse and not tem_sequencia(nums): return False
-    if fl  and linhas_cobertas(nums) < 5: return False
+    if fl  and lines_covered(nums) < 5: return False
     return True
 
 def gerar_jogo(fp, fpa, fs, fse, fl, ff):
@@ -78,7 +72,7 @@ def gerar_jogo(fp, fpa, fs, fse, fl, ff):
 def info_jogo(nums):
     return (contar_primos(nums), contar_pares(nums),
             15 - contar_pares(nums), calcular_soma(nums),
-            tem_sequencia(nums), linhas_cobertas(nums))
+            tem_sequencia(nums), lines_covered(nums))
 
 def make_label(txt, size=13, cor=None, bold=False, halign='left', markup=True, height=None):
     cor = cor or C_TEXTO
@@ -209,7 +203,7 @@ class SplashScreen(Screen):
         conteudo = CardBox(orientation='vertical', padding=dp(24), size_hint=(1, None), height=dp(240))
         camada_interna = FloatLayout(size_hint=(1, 1))
         
-        lbl_titulo = make_label("LOTO DA S_O_R_T_E", size=28, cor=C_BORDA, bold=True, halign='center')
+        lbl_titulo = make_label("LOTO DA SORTE", size=28, cor=C_BORDA, bold=True, halign='center')
         lbl_titulo.size_hint = (1, None)
         lbl_titulo.height = dp(50)
         lbl_titulo.pos_hint = {'x': 0, 'top': 1.0}
@@ -221,15 +215,14 @@ class SplashScreen(Screen):
         w_sep.pos_hint = {'x': 0, 'top': 0.72}
         camada_interna.add_widget(w_sep)
 
-        frase_texto = "Feito com            Por Kelson Carvalho"
-        lbl_creditos = make_label(frase_texto, size=14, cor=C_TEXTO, halign='center')
+        lbl_creditos = make_label("Feito por Kelson Carvalho", size=14, cor=C_TEXTO, halign='center')
         lbl_creditos.size_hint = (1, None)
         lbl_creditos.height = dp(36)
         lbl_creditos.pos_hint = {'x': 0, 'center_y': 0.45}
         camada_interna.add_widget(lbl_creditos)
         
         cora = CoracaoFixo()
-        cora.pos_hint = {'center_x': 0.405, 'center_y': 0.445}
+        cora.pos_hint = {'center_x': 0.5, 'center_y': 0.30}
         camada_interna.add_widget(cora)
 
         lbl_carga = make_label("Carregando arquivos...", size=12, cor=C_SUBTEXTO, halign='center')
@@ -244,7 +237,7 @@ class SplashScreen(Screen):
         self.add_widget(root)
 
     def on_enter(self):
-        Clock.schedule_once(self._ir_para_home, 15)
+        Clock.schedule_once(self._ir_para_home, 3)
 
     def _ir_para_home(self, dt):
         self.app.sm.transition = SlideTransition(direction='left')
@@ -259,9 +252,9 @@ class HomeScreen(Screen):
     def _build(self):
         root = FundoBox(orientation='vertical', padding=dp(14), spacing=dp(10))
         logo = CardBox(orientation='vertical', padding=dp(16), spacing=dp(2), size_hint_y=None, height=dp(110))
-        logo.add_widget(make_label("LOTO DA S_O_R_T_E", size=24, cor=C_BORDA, bold=True, halign='center', height=dp(46)))
+        logo.add_widget(make_label("LOTO DA SORTE", size=24, cor=C_BORDA, bold=True, halign='center', height=dp(46)))
         logo.add_widget(make_label("Gerador Inteligente de Apostas", size=12, cor=C_SUBTEXTO, halign='center', height=dp(24)))
-        logo.add_widget(make_label("Lotofacil  |  Filtros Matematicos", size=11, cor=(0.5, 0.3, 0.8, 0.8), halign='center', height=dp(22)))
+        logo.add_widget(make_label("Lotofacil | Filtros Matematicos", size=11, cor=(0.5, 0.3, 0.8, 0.8), halign='center', height=dp(22)))
         root.add_widget(logo)
 
         sv = ScrollView()
@@ -360,7 +353,7 @@ class GerarScreen(Screen):
 
     def renderizar(self, jogos, filtros_ativos):
         self.jogos_box.clear_widgets()
-        self.info_lbl.text = f"{len(jogos)} jogo(s)  |  {filtros_ativos} filtro(s) ativo(s)"
+        self.info_lbl.text = f"{len(jogos)} jogo(s) | {filtros_ativos} filtro(s) ativo(s)"
         self.info_lbl.color = C_SUBTEXTO
         for i, nums in enumerate(jogos, 1):
             self.jogos_box.add_widget(make_card(i, nums))
@@ -386,4 +379,106 @@ class JogosScreen(Screen):
         b_del.width = dp(90)
         b_del.bind(on_release=lambda x: self.app.limpar_salvos(self))
         hdr.add_widget(b_del)
-        root.
+        root.add_widget(hdr)
+        root.add_widget(sep())
+
+        self.total_lbl = make_label("", size=11, cor=C_SUBTEXTO, height=dp(22))
+        root.add_widget(self.total_lbl)
+
+        self.sv = ScrollView()
+        self.salvos_box = BoxLayout(orientation='vertical', size_hint_y=None, spacing=dp(10), padding=[0, dp(4), 0, dp(16)])
+        self.salvos_box.bind(minimum_height=self.salvos_box.setter('height'))
+        self.sv.add_widget(self.salvos_box)
+        root.add_widget(self.sv)
+        self.add_widget(root)
+
+    def _voltar(self, *a):
+        self.app.sm.transition = SlideTransition(direction='right')
+        self.app.sm.current = 'home'
+
+    def renderizar(self, jogos):
+        self.salvos_box.clear_widgets()
+        self.total_lbl.text = f"Total salvo: {len(jogos)} jogo(s)"
+        if not jogos:
+            self.salvos_box.add_widget(make_label("Nenhum jogo salvo ainda.\nGere jogos e toque em SALVAR!", size=14, cor=C_SUBTEXTO, halign='center', height=dp(80)))
+            return
+        for i, nums in enumerate(jogos, 1):
+            self.salvos_box.add_widget(make_card(i, nums, salvo=True))
+        Clock.schedule_once(lambda dt: setattr(self.sv, 'scroll_y', 1), 0.1)
+
+class LotoDaSorteApp(App):
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self.qtd          = 5
+        self.gerados      = []
+        self._ultima_cfg  = (True, True, True, True, True, True)
+        self.salvos       = []
+        self.save_file    = ""
+
+    def build(self):
+        try:
+            self.save_file = os.path.join(self.user_data_dir, "lotodasorte_salvos.json")
+            if os.path.exists(self.save_file):
+                with open(self.save_file, 'r') as f:
+                    self.salvos = json.load(f)
+        except Exception:
+            self.salvos = []
+
+        self.sm = ScreenManager()
+        self.splash_scr = SplashScreen(self)
+        self.home_scr   = HomeScreen(self)
+        self.gerar_scr  = GerarScreen(self)
+        self.jogos_scr  = JogosScreen(self)
+        
+        for s in (self.splash_scr, self.home_scr, self.gerar_scr, self.jogos_scr):
+            self.sm.add_widget(s)
+            
+        return self.sm
+
+    def set_qtd(self, n, home):
+        self.qtd = n
+        home.qtd_lbl.text = f"Selecionado: {n} jogo{'s' if n > 1 else ''}"
+
+    def gerar_jogos(self):
+        sw = self.home_scr.switches
+        fp, fpa, fs, fse, fl, ff = sw['primos'].active, sw['pares'].active, sw['soma'].active, sw['seq'].active, sw['linhas'].active, sw['freq'].active
+        self._ultima_cfg = (fp, fpa, fs, fse, fl, ff)
+        fativos = sum([fp, fpa, fs, fse, fl, ff])
+        self.gerados = [gerar_jogo(fp, fpa, fs, fse, fl, ff) for _ in range(self.qtd)]
+        self.gerar_scr.renderizar(self.gerados, fativos)
+        self.sm.transition = SlideTransition(direction='left')
+        self.sm.current = 'gerar'
+
+    def salvar_jogos(self, scr):
+        if not self.gerados:
+            scr.info_lbl.text  = "Gere jogos primeiro!"
+            scr.info_lbl.color = C_VERMELHO
+            return
+        self.salvos.extend(self.gerados)
+        self.gravar_dados()
+        scr.info_lbl.text  = f"Salvos! Total na carteira: {len(self.salvos)} jogo(s)"
+        scr.info_lbl.color = C_VERDE
+
+    def ir_salvos(self):
+        self.jogos_scr.renderizar(self.salvos)
+        self.sm.transition = SlideTransition(direction='left')
+        self.sm.current = 'jogos'
+
+    def limpar_salvos(self, scr):
+        self.salvos = []
+        self.gravar_dados()
+        scr.renderizar([])
+
+    def gravar_dados(self):
+        try:
+            if self.save_file:
+                with open(self.save_file, 'w') as f:
+                    json.dump(self.salvos, f)
+        except Exception:
+            pass
+
+    def on_stop(self):
+        self.gravar_dados()
+
+if __name__ == '__main__':
+    LotoDaSorteApp().run()
