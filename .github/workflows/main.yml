@@ -86,6 +86,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildozer-
 
+    - name: Aceitar Licenças do Android SDK automaticamente
+      run: |
+        # Cria a pasta de licenças do Android antes que o Buildozer comece a baixar as ferramentas
+        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+        
+        # Injeta os hashes de aprovação oficiais das licenças SDK do Android
+        echo -e "\n8933bad161af4178b1185d1a37fdd41ea5fb44d5\n739a052649f257d64718415214acb7ebea6fdb13\n601085b94cd77f6b54b78cf0de2396e3861186ec\nc33c2f33b3de51911efded4c72193dd504621676\n24333f1a63b6825ea9c5514f83c2829b004d1fee\n84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+
     - name: Gerar APK com Buildozer
       run: buildozer -v android debug
 
