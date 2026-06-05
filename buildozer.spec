@@ -19,8 +19,7 @@ source.include_exts = py,png,jpg,kv,atlas,json
 version = 1.0.0
 
 # (list) Application requirements
-# Kivy 2.3.1 travado conforme especificado + Pillow para processar os elementos gráficos da Splash e das dezenas
-requirements = python3,kivy==2.3.1,pillow
+requirements = hostpython3,python3,kivy==2.3.1,sdl2,pillow
 
 # (list) Supported orientations
 orientation = portrait
@@ -34,19 +33,15 @@ fullscreen = 1
 # =============================================================================
 
 # (list) Permissions
-android.permissions = INTERNET
+android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 
-# (int) Target Android API
+# (int) Target Android API (Compatível com Java 17)
 android.api = 33
 
 # (int) Minimum API your APK will support
 android.minapi = 21
 
-# (int) Android SDK version to use
-android.sdk = 33
-
-# (str) Versão das ferramentas de construção (CORREÇÃO DE ERRO)
-# Travar em 33.0.0 impede que o Buildozer busque a versão 37 (instável) que causou a falha de licença
+# (str) Versão das ferramentas de construção
 android.build_tools_version = 33.0.0
 
 # (bool) Use --private data storage for binary removal
@@ -55,10 +50,10 @@ android.private_storage = True
 # (str) Android entry point
 android.entrypoint = main.py
 
-# (list) Architecture to build for (Combinação padrão para abranger 99% dos celulares)
-android.archs = arm64-v8a,armeabi-v7a
+# (list) Architecture to build for
+android.archs = arm64-v8a, armeabi-v7a
 
-# (bool) Enable AndroidX support (Essencial para builds modernas do Gradle)
+# (bool) Enable AndroidX support
 android.androidx = True
 
 
@@ -68,7 +63,7 @@ android.androidx = True
 
 [buildozer]
 
-# (int) Log level (2 = debug com visualização completa de comandos e erros no GitHub)
+# (int) Log level (2 = debug completo)
 log_level = 2
 
 # (int) Display warning if buildozer is run as root
