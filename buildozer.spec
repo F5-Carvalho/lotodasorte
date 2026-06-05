@@ -19,7 +19,6 @@ source.include_exts = py,png,jpg,kv,atlas,json
 version = 1.0.0
 
 # (list) Application requirements
-# CORREÇÃO: Inclusão do sdl2_ttf para garantir a renderização de fontes nativas sem crash
 requirements = hostpython3,python3,kivy==2.3.1,sdl2,sdl2_ttf,pillow
 
 # (list) Supported orientations
@@ -34,8 +33,6 @@ fullscreen = 1
 # =============================================================================
 
 # (list) Permissions
-# CORREÇÃO: Mantido apenas INTERNET. Como usamos a sandbox interna do Kivy para o JSON,
-# permissões extras de escrita externa foram removidas para evitar bloqueios de segurança do Android.
 android.permissions = INTERNET
 
 # (int) Target Android API (Compatível com o Java 17 do GitHub Actions)
@@ -53,10 +50,10 @@ android.private_storage = True
 # (str) Android entry point
 android.entrypoint = main.py
 
-# (list) Architecture to build for (Cobre os celulares modernos e antigos)
+# (list) Architecture to build for
 android.archs = arm64-v8a, armeabi-v7a
 
-# (bool) Enable AndroidX support (Obrigatório para compilações estáveis do Gradle)
+# (bool) Enable AndroidX support
 android.androidx = True
 
 
@@ -66,7 +63,7 @@ android.androidx = True
 
 [buildozer]
 
-# (int) Log level (2 = debug completo para vermos tudo no console do Github se precisar)
+# (int) Log level (2 = debug completo)
 log_level = 2
 
 # (int) Display warning if buildozer is run as root
