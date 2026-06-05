@@ -5,7 +5,7 @@ on:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  workflow_dispatch: # Permite que você clique em um botão e force a build manualmente se desejar
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,17 +18,25 @@ jobs:
     - name: Configurar o Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11' # Versão ideal e sem quebras de sintaxe com o Cython moderno
+        python-version: '3.11'
 
     - name: Configurar Java JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17' # Necessário para o Gradle e SDK do Android mais recente
+        java-version: '17'
 
     - name: Instalar dependências do sistema Android / Buildozer
       run: |
         sudo apt-get update
+        
+        # 1. Corrige problemas de pacotes retidos na imagem nativa do GitHub
+        sudo apt-get install -f -y
+        
+        # 2. Instala a dependência que estava quebrando o GStreamer isoladamente
+        sudo apt-get install -y libunwind-dev
+        
+        # 3. Instala o restante dos pacotes necessários para o Buildozer
         sudo apt-get install -y \
           build-essential \
           git \
