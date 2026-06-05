@@ -1,10 +1,6 @@
 """
 LotoDaSorte - Gerador Inteligente de Apostas Lotofacil
-Compativel com Kivy 2.3.1 - Pydroid 3
-- Jogos salvos persistem entre sessoes (arquivo JSON)
-- Botao Voltar corrigido
-- Inclui SplashScreen de 15 segundos
-- Coração e texto da Splash corrigidos definitivamente com posicionamento absoluto
+Versão Corrigida para APK (Sem travamento de caminhos)
 """
 
 import random
@@ -26,28 +22,7 @@ from kivy.clock import Clock
 
 Window.clearcolor = (0.05, 0.0, 0.10, 1)
 
-# ── Arquivo de persistência ───────────────────────────────────
-SAVE_FILE = os.path.join(
-    os.path.expanduser("~"), "lotodasorte_salvos.json"
-)
-
-def carregar_salvos():
-    try:
-        if os.path.exists(SAVE_FILE):
-            with open(SAVE_FILE, 'r') as f:
-                return json.load(f)
-    except Exception:
-        pass
-    return []
-
-def gravar_salvos(lista):
-    try:
-        with open(SAVE_FILE, 'w') as f:
-            json.dump(lista, f)
-    except Exception:
-        pass
-
-# ── Paleta ───────────────────────────────────────────────────
+# Paleta de Cores
 C_FUNDO     = (0.05, 0.00, 0.10, 1)
 C_CARD      = (0.12, 0.02, 0.22, 1)
 C_ROXO_VIV  = (0.55, 0.10, 0.90, 1)
@@ -59,14 +34,10 @@ C_BTN_ESC   = (0.20, 0.02, 0.38, 1)
 C_VERDE     = (0.20, 0.90, 0.50, 1)
 C_VERMELHO  = (1.00, 0.15, 0.25, 1)
 
-# ── Dados históricos ─────────────────────────────────────────
-MAIS_SORTEADOS = [20,10,25,11,13,24,1,4,14,3,
-                  12,2,5,22,15,19,9,18,21,7,6,17,23,8,16]
+MAIS_SORTEADOS = [20,10,25,11,13,24,1,4,14,3,12,2,5,22,15,19,9,18,21,7,6,17,23,8,16]
 PRIMOS_25 = {2,3,5,7,11,13,17,19,23}
-LINHAS    = [{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},
-             {16,17,18,19,20},{21,22,23,24,25}]
+LINHAS    = [{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20},{21,22,23,24,25}]
 
-# ── Lógica ───────────────────────────────────────────────────
 def contar_primos(n): return sum(1 for x in n if x in PRIMOS_25)
 def contar_pares(n):  return sum(1 for x in n if x % 2 == 0)
 def calcular_soma(n): return sum(n)
@@ -109,9 +80,7 @@ def info_jogo(nums):
             15 - contar_pares(nums), calcular_soma(nums),
             tem_sequencia(nums), linhas_cobertas(nums))
 
-# ── Helpers UI ───────────────────────────────────────────────
-def make_label(txt, size=13, cor=None, bold=False,
-               halign='left', markup=True, height=None):
+def make_label(txt, size=13, cor=None, bold=False, halign='left', markup=True, height=None):
     cor = cor or C_TEXTO
     h   = height or dp(size * 2.2)
     l   = Label(text=txt, font_size=dp(size), color=cor, bold=bold,
@@ -131,8 +100,7 @@ def make_btn(txt, cor=None, h=dp(50), size=14):
             Color(*cor)
             RoundedRectangle(pos=b.pos, size=b.size, radius=[dp(12)])
             Color(0.7, 0.3, 1.0, 0.5)
-            Line(rounded_rectangle=[b.x, b.y, b.width, b.height, dp(12)],
-                 width=dp(1))
+            Line(rounded_rectangle=[b.x, b.y, b.width, b.height, dp(12)], width=dp(1))
     b.bind(pos=_draw, size=_draw)
     return b
 
@@ -141,8 +109,7 @@ def sep():
     with w.canvas:
         Color(0.5, 0.15, 0.8, 0.5)
         w._r = Rectangle(pos=w.pos, size=w.size)
-    w.bind(pos=lambda i, v: setattr(i._r, 'pos', v),
-           size=lambda i, v: setattr(i._r, 'size', v))
+    w.bind(pos=lambda i, v: setattr(i._r, 'pos', v), size=lambda i, v: setattr(i._r, 'size', v))
     return w
 
 class CardBox(BoxLayout):
@@ -155,9 +122,7 @@ class CardBox(BoxLayout):
             Color(*C_CARD)
             RoundedRectangle(pos=self.pos, size=self.size, radius=[dp(14)])
             Color(0.55, 0.15, 0.85, 0.5)
-            Line(rounded_rectangle=[self.x, self.y,
-                                     self.width, self.height, dp(14)],
-                 width=dp(1.2))
+            Line(rounded_rectangle=[self.x, self.y, self.width, self.height, dp(14)], width=dp(1.2))
 
 class FundoBox(BoxLayout):
     def __init__(self, **kw):
@@ -169,7 +134,6 @@ class FundoBox(BoxLayout):
             Color(*C_FUNDO)
             Rectangle(pos=self.pos, size=self.size)
 
-# ── Bola numérica ────────────────────────────────────────────
 class Bola(FloatLayout):
     def __init__(self, numero, destaque=False, **kw):
         sz = dp(36)
@@ -198,68 +162,41 @@ class Bola(FloatLayout):
             Color(*borda)
             Ellipse(pos=self.pos, size=self.size)
             Color(*inner)
-            Ellipse(pos=(self.x+dp(2.5), self.y+dp(2.5)),
-                    size=(self.width-dp(5), self.height-dp(5)))
+            Ellipse(pos=(self.x+dp(2.5), self.y+dp(2.5)), size=(self.width-dp(5), self.height-dp(5)))
             Color(1, 1, 1, 0.12)
-            Ellipse(pos=(self.x+dp(8), self.y+self.height*0.55),
-                    size=(self.width*0.4, self.height*0.22))
+            Ellipse(pos=(self.x+dp(8), self.y+self.height*0.55), size=(self.width*0.4, self.height*0.22))
 
-# ── Card de jogo ─────────────────────────────────────────────
 def make_card(idx, nums, salvo=False):
     primos, pares, impares, soma, seq, lins = info_jogo(nums)
     top10 = set(MAIS_SORTEADOS[:10])
-
-    card = CardBox(orientation='vertical', padding=dp(14),
-                   spacing=dp(6), size_hint_y=None, height=dp(170))
-
+    card = CardBox(orientation='vertical', padding=dp(14), spacing=dp(6), size_hint_y=None, height=dp(170))
     prefixo = "[SALVO] " if salvo else ""
-    card.add_widget(make_label(f"{prefixo}Jogo {idx:02d}", size=15,
-                               cor=C_BORDA, bold=True, height=dp(30)))
-
-    sv = ScrollView(size_hint_y=None, height=dp(44),
-                    do_scroll_y=False, do_scroll_x=True, bar_width=0)
-    row = BoxLayout(orientation='horizontal',
-                    size_hint=(None, None), height=dp(40),
-                    spacing=dp(4))
+    card.add_widget(make_label(f"{prefixo}Jogo {idx:02d}", size=15, cor=C_BORDA, bold=True, height=dp(30)))
+    sv = ScrollView(size_hint_y=None, height=dp(44), do_scroll_y=False, do_scroll_x=True, bar_width=0)
+    row = BoxLayout(orientation='horizontal', size_hint=(None, None), height=dp(40), spacing=dp(4))
     row.width = len(nums) * dp(40)
     for n in sorted(nums):
         row.add_widget(Bola(n, destaque=(n in top10)))
     sv.add_widget(row)
     card.add_widget(sv)
-
-    card.add_widget(make_label(
-        f"Primos: {primos}   Pares: {pares}   "
-        f"Impares: {impares}   Soma: {soma}",
-        size=12, cor=C_SUBTEXTO, height=dp(26)))
-
+    card.add_widget(make_label(f"Primos: {primos}   Pares: {pares}   Impares: {impares}   Soma: {soma}", size=12, cor=C_SUBTEXTO, height=dp(26)))
     seq_txt = "SIM" if seq else "NAO"
-    card.add_widget(make_label(
-        f"Sequencia: {seq_txt}   Linhas: {lins}/5   "
-        f"Top10: {sum(1 for n in nums if n in top10)}",
-        size=12, cor=C_SUBTEXTO, height=dp(26)))
-
+    card.add_widget(make_label(f"Sequencia: {seq_txt}   Linhas: {lins}/5   Top10: {sum(1 for n in nums if n in top10)}", size=12, cor=C_SUBTEXTO, height=dp(26)))
     return card
 
-# ── Widget do Coração Estabilizado em Posição Absoluta ────────
 class CoracaoFixo(Widget):
     def __init__(self, **kw):
         super().__init__(size_hint=(None, None), size=(dp(16), dp(16)), **kw)
         self.bind(pos=self._draw, size=self._draw)
-
     def _draw(self, *a):
         self.canvas.clear()
         with self.canvas:
             Color(*C_VERMELHO)
             Ellipse(pos=(self.x, self.y + self.height * 0.25), size=(self.width * 0.58, self.height * 0.58))
             Ellipse(pos=(self.x + self.width * 0.42, self.y + self.height * 0.25), size=(self.width * 0.58, self.height * 0.58))
-            v = [
-                self.x, self.y + self.height * 0.5, 0, 0,
-                self.x + self.width, self.y + self.height * 0.5, 0, 0,
-                self.x + self.width * 0.5, self.y + dp(1), 0, 0
-            ]
+            v = [self.x, self.y + self.height * 0.5, 0, 0, self.x + self.width, self.y + self.height * 0.5, 0, 0, self.x + self.width * 0.5, self.y + dp(1), 0, 0]
             Mesh(vertices=v, indices=[0, 1, 2], mode='triangles')
 
-# ── Tela Splash Corrigida Definitivamente ───────────────────
 class SplashScreen(Screen):
     def __init__(self, app, **kw):
         super().__init__(name='splash', **kw)
@@ -268,29 +205,22 @@ class SplashScreen(Screen):
 
     def _build(self):
         root = FundoBox(orientation='vertical', padding=dp(24))
-        root.add_widget(Widget()) # Alinhamento vertical
-
-        # Card Central usando FloatLayout para travar as posições sem bugs do BoxLayout
+        root.add_widget(Widget())
         conteudo = CardBox(orientation='vertical', padding=dp(24), size_hint=(1, None), height=dp(240))
-        
         camada_interna = FloatLayout(size_hint=(1, 1))
         
-        # 1. Título do App
-        lbl_titulo = make_label("LOTO DA SORTE", size=28, cor=C_BORDA, bold=True, halign='center')
+        lbl_titulo = make_label("LOTO DA S_O_R_T_E", size=28, cor=C_BORDA, bold=True, halign='center')
         lbl_titulo.size_hint = (1, None)
         lbl_titulo.height = dp(50)
         lbl_titulo.pos_hint = {'x': 0, 'top': 1.0}
         camada_interna.add_widget(lbl_titulo)
         
-        # Separador decorativo posicionado abaixo do título
         w_sep = sep()
         w_sep.size_hint = (1, None)
         w_sep.height = dp(2)
         w_sep.pos_hint = {'x': 0, 'top': 0.72}
         camada_interna.add_widget(w_sep)
 
-        # 2. Frase de Créditos Estabilizada por espaçamento em string única
-        # Deixamos um buraco exato de espaços para posicionar o coração vetorial por cima
         frase_texto = "Feito com            Por Kelson Carvalho"
         lbl_creditos = make_label(frase_texto, size=14, cor=C_TEXTO, halign='center')
         lbl_creditos.size_hint = (1, None)
@@ -298,12 +228,10 @@ class SplashScreen(Screen):
         lbl_creditos.pos_hint = {'x': 0, 'center_y': 0.45}
         camada_interna.add_widget(lbl_creditos)
         
-        # Coração fixado milimetricamente por cima do espaço em branco da frase anterior
         cora = CoracaoFixo()
         cora.pos_hint = {'center_x': 0.405, 'center_y': 0.445}
         camada_interna.add_widget(cora)
 
-        # 3. Status de Carregamento
         lbl_carga = make_label("Carregando arquivos...", size=12, cor=C_SUBTEXTO, halign='center')
         lbl_carga.size_hint = (1, None)
         lbl_carga.height = dp(30)
@@ -312,8 +240,7 @@ class SplashScreen(Screen):
         
         conteudo.add_widget(camada_interna)
         root.add_widget(conteudo)
-        root.add_widget(Widget()) # Alinhamento vertical
-        
+        root.add_widget(Widget())
         self.add_widget(root)
 
     def on_enter(self):
@@ -323,7 +250,6 @@ class SplashScreen(Screen):
         self.app.sm.transition = SlideTransition(direction='left')
         self.app.sm.current = 'home'
 
-# ── Tela Home ────────────────────────────────────────────────
 class HomeScreen(Screen):
     def __init__(self, app, **kw):
         super().__init__(name='home', **kw)
@@ -332,30 +258,18 @@ class HomeScreen(Screen):
 
     def _build(self):
         root = FundoBox(orientation='vertical', padding=dp(14), spacing=dp(10))
-
-        # Logo
-        logo = CardBox(orientation='vertical', padding=dp(16), spacing=dp(2),
-                       size_hint_y=None, height=dp(110))
-        logo.add_widget(make_label("LOTO DA SORTE", size=24, cor=C_BORDA,
-                                    bold=True, halign='center', height=dp(46)))
-        logo.add_widget(make_label("Gerador Inteligente de Apostas",
-                                    size=12, cor=C_SUBTEXTO,
-                                    halign='center', height=dp(24)))
-        logo.add_widget(make_label("Lotofacil  |  Filtros Matematicos",
-                                    size=11, cor=(0.5, 0.3, 0.8, 0.8),
-                                    halign='center', height=dp(22)))
+        logo = CardBox(orientation='vertical', padding=dp(16), spacing=dp(2), size_hint_y=None, height=dp(110))
+        logo.add_widget(make_label("LOTO DA S_O_R_T_E", size=24, cor=C_BORDA, bold=True, halign='center', height=dp(46)))
+        logo.add_widget(make_label("Gerador Inteligente de Apostas", size=12, cor=C_SUBTEXTO, halign='center', height=dp(24)))
+        logo.add_widget(make_label("Lotofacil  |  Filtros Matematicos", size=11, cor=(0.5, 0.3, 0.8, 0.8), halign='center', height=dp(22)))
         root.add_widget(logo)
 
         sv = ScrollView()
-        sv_box = BoxLayout(orientation='vertical', size_hint_y=None,
-                           spacing=dp(12), padding=[0, 0, 0, dp(20)])
+        sv_box = BoxLayout(orientation='vertical', size_hint_y=None, spacing=dp(12), padding=[0, 0, 0, dp(20)])
         sv_box.bind(minimum_height=sv_box.setter('height'))
 
-        # Card quantidade
-        c_qtd = CardBox(orientation='vertical', padding=dp(14), spacing=dp(8),
-                        size_hint_y=None, height=dp(118))
-        c_qtd.add_widget(make_label("Quantidade de Jogos", size=14,
-                                     cor=C_BORDA, bold=True, height=dp(28)))
+        c_qtd = CardBox(orientation='vertical', padding=dp(14), spacing=dp(8), size_hint_y=None, height=dp(118))
+        c_qtd.add_widget(make_label("Quantidade de Jogos", size=14, cor=C_BORDA, bold=True, height=dp(28)))
         c_qtd.add_widget(sep())
         row_qtd = BoxLayout(size_hint_y=None, height=dp(46), spacing=dp(6))
         for n in [1, 3, 5, 10]:
@@ -363,16 +277,12 @@ class HomeScreen(Screen):
             b.bind(on_release=lambda x, v=n: self.app.set_qtd(v, self))
             row_qtd.add_widget(b)
         c_qtd.add_widget(row_qtd)
-        self.qtd_lbl = make_label("Selecionado: 5 jogos", size=11,
-                                   cor=C_SUBTEXTO, height=dp(22))
+        self.qtd_lbl = make_label("Selecionado: 5 jogos", size=11, cor=C_SUBTEXTO, height=dp(22))
         c_qtd.add_widget(self.qtd_lbl)
         sv_box.add_widget(c_qtd)
 
-        # Card filtros
-        c_fil = CardBox(orientation='vertical', padding=dp(14), spacing=dp(2),
-                        size_hint_y=None, height=dp(310))
-        c_fil.add_widget(make_label("Filtros Matematicos", size=14,
-                                     cor=C_BORDA, bold=True, height=dp(28)))
+        c_fil = CardBox(orientation='vertical', padding=dp(14), spacing=dp(2), size_hint_y=None, height=dp(310))
+        c_fil.add_widget(make_label("Filtros Matematicos", size=14, cor=C_BORDA, bold=True, height=dp(28)))
         c_fil.add_widget(sep())
         self.switches = {}
         for key, txt in [
@@ -395,7 +305,6 @@ class HomeScreen(Screen):
         b_gerar = make_btn("GERAR JOGOS", cor=C_ROXO_VIV, h=dp(58), size=17)
         b_gerar.bind(on_release=lambda x: self.app.gerar_jogos())
         sv_box.add_widget(b_gerar)
-
         b_salvos = make_btn("Ver Jogos Salvos", cor=C_BTN_ESC, h=dp(46), size=13)
         b_salvos.bind(on_release=lambda x: self.app.ir_salvos())
         sv_box.add_widget(b_salvos)
@@ -404,7 +313,6 @@ class HomeScreen(Screen):
         root.add_widget(sv)
         self.add_widget(root)
 
-# ── Tela Jogos Gerados ───────────────────────────────────────
 class GerarScreen(Screen):
     def __init__(self, app, **kw):
         super().__init__(name='gerar', **kw)
@@ -413,15 +321,13 @@ class GerarScreen(Screen):
 
     def _build(self):
         root = FundoBox(orientation='vertical', padding=dp(14), spacing=dp(8))
-
         hdr = BoxLayout(size_hint_y=None, height=dp(50), spacing=dp(8))
         b_back = make_btn("< Voltar", cor=C_BTN_ESC, h=dp(44), size=13)
         b_back.size_hint_x = None
         b_back.width = dp(100)
         b_back.bind(on_release=self._voltar)
         hdr.add_widget(b_back)
-        hdr.add_widget(make_label("Jogos Gerados", size=17,
-                                   cor=C_BORDA, bold=True, height=dp(50)))
+        hdr.add_widget(make_label("Jogos Gerados", size=17, cor=C_BORDA, bold=True, height=dp(50)))
         root.add_widget(hdr)
         root.add_widget(sep())
 
@@ -429,9 +335,7 @@ class GerarScreen(Screen):
         root.add_widget(self.info_lbl)
 
         self.sv = ScrollView()
-        self.jogos_box = BoxLayout(orientation='vertical', size_hint_y=None,
-                                    spacing=dp(10),
-                                    padding=[0, dp(4), 0, dp(16)])
+        self.jogos_box = BoxLayout(orientation='vertical', size_hint_y=None, spacing=dp(10), padding=[0, dp(4), 0, dp(16)])
         self.jogos_box.bind(minimum_height=self.jogos_box.setter('height'))
         self.sv.add_widget(self.jogos_box)
         root.add_widget(self.sv)
@@ -449,23 +353,19 @@ class GerarScreen(Screen):
     def _voltar(self, *a):
         self.app.sm.transition = SlideTransition(direction='right')
         self.app.sm.current = 'home'
-
     def _salvar(self, *a):
         self.app.salvar_jogos(self)
-
     def _novo(self, *a):
         self.app.gerar_jogos()
 
     def renderizar(self, jogos, filtros_ativos):
         self.jogos_box.clear_widgets()
-        self.info_lbl.text = (f"{len(jogos)} jogo(s)  |  "
-                              f"{filtros_ativos} filtro(s) ativo(s)")
+        self.info_lbl.text = f"{len(jogos)} jogo(s)  |  {filtros_ativos} filtro(s) ativo(s)"
         self.info_lbl.color = C_SUBTEXTO
         for i, nums in enumerate(jogos, 1):
             self.jogos_box.add_widget(make_card(i, nums))
         Clock.schedule_once(lambda dt: setattr(self.sv, 'scroll_y', 1), 0.1)
 
-# ── Tela Jogos Salvos ────────────────────────────────────────
 class JogosScreen(Screen):
     def __init__(self, app, **kw):
         super().__init__(name='jogos', **kw)
@@ -474,119 +374,16 @@ class JogosScreen(Screen):
 
     def _build(self):
         root = FundoBox(orientation='vertical', padding=dp(14), spacing=dp(8))
-
         hdr = BoxLayout(size_hint_y=None, height=dp(50), spacing=dp(8))
         b_back = make_btn("< Voltar", cor=C_BTN_ESC, h=dp(44), size=13)
         b_back.size_hint_x = None
         b_back.width = dp(100)
         b_back.bind(on_release=self._voltar)
         hdr.add_widget(b_back)
-        hdr.add_widget(make_label("Jogos Salvos", size=17,
-                                   cor=C_BORDA, bold=True, height=dp(50)))
+        hdr.add_widget(make_label("Jogos Salvos", size=17, cor=C_BORDA, bold=True, height=dp(50)))
         b_del = make_btn("Limpar", cor=(0.5, 0, 0.1, 1), h=dp(44), size=12)
         b_del.size_hint_x = None
         b_del.width = dp(90)
         b_del.bind(on_release=lambda x: self.app.limpar_salvos(self))
         hdr.add_widget(b_del)
-        root.add_widget(hdr)
-        root.add_widget(sep())
-
-        self.total_lbl = make_label("", size=11, cor=C_SUBTEXTO, height=dp(22))
-        root.add_widget(self.total_lbl)
-
-        self.sv = ScrollView()
-        self.salvos_box = BoxLayout(orientation='vertical', size_hint_y=None,
-                                     spacing=dp(10),
-                                     padding=[0, dp(4), 0, dp(16)])
-        self.salvos_box.bind(minimum_height=self.salvos_box.setter('height'))
-        self.sv.add_widget(self.salvos_box)
-        root.add_widget(self.sv)
-        self.add_widget(root)
-
-    def _voltar(self, *a):
-        self.app.sm.transition = SlideTransition(direction='right')
-        self.app.sm.current = 'home'
-
-    def renderizar(self, jogos):
-        self.salvos_box.clear_widgets()
-        self.total_lbl.text = f"Total salvo: {len(jogos)} jogo(s)"
-        if not jogos:
-            self.salvos_box.add_widget(
-                make_label("Nenhum jogo salvo ainda.\n"
-                           "Gere jogos e toque em SALVAR!",
-                           size=14, cor=C_SUBTEXTO,
-                           halign='center', height=dp(80)))
-            return
-        for i, nums in enumerate(jogos, 1):
-            self.salvos_box.add_widget(make_card(i, nums, salvo=True))
-        Clock.schedule_once(lambda dt: setattr(self.sv, 'scroll_y', 1), 0.1)
-
-# ── App principal ────────────────────────────────────────────
-class LotoDaSorteApp(App):
-    def __init__(self, **kw):
-        super().__init__(**kw)
-        self.qtd          = 5
-        self.gerados      = []
-        self._ultima_cfg  = (True, True, True, True, True, True)
-        self.salvos = carregar_salvos()
-
-    def build(self):
-        self.sm = ScreenManager()
-        
-        self.splash_scr = SplashScreen(self)
-        self.home_scr   = HomeScreen(self)
-        self.gerar_scr  = GerarScreen(self)
-        self.jogos_scr  = JogosScreen(self)
-        
-        for s in (self.splash_scr, self.home_scr, self.gerar_scr, self.jogos_scr):
-            self.sm.add_widget(s)
-            
-        return self.sm
-
-    def set_qtd(self, n, home):
-        self.qtd = n
-        home.qtd_lbl.text = f"Selecionado: {n} jogo{'s' if n > 1 else ''}"
-
-    def gerar_jogos(self):
-        sw = self.home_scr.switches
-        fp  = sw['primos'].active
-        fpa = sw['pares'].active
-        fs  = sw['soma'].active
-        fse = sw['seq'].active
-        fl  = sw['linhas'].active
-        ff  = sw['freq'].active
-        self._ultima_cfg = (fp, fpa, fs, fse, fl, ff)
-        fativos = sum([fp, fpa, fs, fse, fl, ff])
-        self.gerados = [gerar_jogo(fp, fpa, fs, fse, fl, ff)
-                        for _ in range(self.qtd)]
-        self.gerar_scr.renderizar(self.gerados, fativos)
-        self.sm.transition = SlideTransition(direction='left')
-        self.sm.current = 'gerar'
-
-    def salvar_jogos(self, scr):
-        if not self.gerados:
-            scr.info_lbl.text  = "Gere jogos primeiro!"
-            scr.info_lbl.color = C_VERMELHO
-            return
-        self.salvos.extend(self.gerados)
-        gravar_salvos(self.salvos)
-        scr.info_lbl.text  = (f"Salvos! Total na carteira: "
-                               f"{len(self.salvos)} jogo(s)")
-        scr.info_lbl.color = C_VERDE
-
-    def ir_salvos(self):
-        self.jogos_scr.renderizar(self.salvos)
-        self.sm.transition = SlideTransition(direction='left')
-        self.sm.current = 'jogos'
-
-    def limpar_salvos(self, scr):
-        self.salvos = []
-        gravar_salvos([])
-        scr.renderizar([])
-
-    def on_stop(self):
-        gravar_salvos(self.salvos)
-
-
-if __name__ == '__main__':
-    LotoDaSorteApp().run()
+        root.
