@@ -15,15 +15,14 @@ source.dir = .
 # (list) Source files to include (let empty to include all the files)
 source.include_exts = py,png,jpg,kv,atlas,json
 
-# (string) Application versioning (method 1)
+# (string) Application versioning
 version = 1.0.0
 
 # (list) Application requirements
-# NOTA: Inclui exatamente o Kivy 2.3.1 solicitado e as dependências necessárias para a interface gráfica
+# Kivy 2.3.1 travado conforme especificado + Pillow para processar os elementos gráficos da Splash e das dezenas
 requirements = python3,kivy==2.3.1,pillow
 
-# (str) Custom source for roms/assets if needed (leave empty if none)
-# (list) Supported orientations (valid options are: landscape, portrait, portrait-reverse, landscape-reverse)
+# (list) Supported orientations
 orientation = portrait
 
 # (bool) Indicate if the application should be fullscreen or not
@@ -35,43 +34,32 @@ fullscreen = 1
 # =============================================================================
 
 # (list) Permissions
-# O seu código usa armazenamento isolado no escopo do usuário (os.path.expanduser),
-# portanto não precisa de permissões críticas de leitura/escrita externa no Android moderno.
 android.permissions = INTERNET
 
-# (int) Target Android API, should be as high as possible.
-# API 33 é a mais estável para o ecossistema Kivy + Java 17 do seu main.yml
+# (int) Target Android API
 android.api = 33
 
-# (int) Minimum API your APK will support.
+# (int) Minimum API your APK will support
 android.minapi = 21
 
 # (int) Android SDK version to use
 android.sdk = 33
 
-# (str) Android NDK version to use
-android.ndk_path = 
+# (str) Versão das ferramentas de construção (CORREÇÃO DE ERRO)
+# Travar em 33.0.0 impede que o Buildozer busque a versão 37 (instável) que causou a falha de licença
+android.build_tools_version = 33.0.0
 
 # (bool) Use --private data storage for binary removal
 android.private_storage = True
 
-# (str) Android entry point, default is OK
+# (str) Android entry point
 android.entrypoint = main.py
 
-# (list) Pattern to exclude from the image/source directory
-# android.source_artifact_filters = *.*
-
-# (list) Architecture to build for (ARM64 é o padrão para celulares modernos)
+# (list) Architecture to build for (Combinação padrão para abranger 99% dos celulares)
 android.archs = arm64-v8a,armeabi-v7a
 
-# (bool) Enable AndroidX support (obrigatório para compilações modernas)
+# (bool) Enable AndroidX support (Essencial para builds modernas do Gradle)
 android.androidx = True
-
-# (list) Gradle dependencies
-# android.gradle_dependencies =
-
-# (bool) Skip byte compile for .py files
-# android.skip_byte_compile = False
 
 
 # =============================================================================
@@ -80,8 +68,8 @@ android.androidx = True
 
 [buildozer]
 
-# (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
+# (int) Log level (2 = debug com visualização completa de comandos e erros no GitHub)
 log_level = 2
 
-# (int) Display warning if buildozer is run as root (0 = False, 1 = True)
+# (int) Display warning if buildozer is run as root
 warn_on_root = 1
